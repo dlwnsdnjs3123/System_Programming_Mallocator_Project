@@ -1,50 +1,52 @@
-# System Programming Mallocator Project
+# System_Programming_Mallocator_Project
 
-This repository contains a custom dynamic memory allocator implemented in C for a system programming course project. The allocator was designed to balance memory utilization and throughput while handling repeated small allocations efficiently.
+시스템프로그래밍 수업의 동적 메모리 할당기 프로젝트입니다. `mm_malloc`, `mm_free`, `mm_realloc`을 직접 구현하며 메모리 이용률과 처리 속도를 함께 개선하는 것을 목표로 했습니다.
 
-## Overview
+## 개요
 
-- Implemented `mm_malloc`, `mm_free`, and `mm_realloc`
-- Built a segregated explicit free list allocator
-- Added immediate coalescing for adjacent free blocks
-- Used best-fit style search within size classes
-- Added a small-object pool optimization for frequent small allocations
-- Optimized `realloc` to grow in place when possible
+- `mm_malloc`, `mm_free`, `mm_realloc` 구현
+- segregated explicit free list 기반 할당기 설계
+- 인접 free block 즉시 coalescing
+- 크기 클래스 내부에서 best-fit 성격의 탐색 적용
+- 작은 크기 요청을 위한 별도 pool 최적화
+- 가능할 때 `realloc`의 in-place 확장 시도
 
-## Project Structure
+## 파일 구성
 
-- `mm.c`: allocator implementation
-- `mm.h`: allocator interface and team metadata struct
-- `mdriver.c`: driver used to validate correctness and measure performance
-- `memlib.*`, `fsecs.*`, `fcyc.*`, `clock.*`, `ftimer.*`: support code provided for the lab environment
-- `tracefiles/`: benchmark traces used by the driver
+- `mm.c`: 할당기 핵심 구현
+- `mm.h`: 인터페이스 및 구조체 정의
+- `mdriver.c`: 정합성과 성능을 측정하는 드라이버
+- `memlib.*`, `fsecs.*`, `fcyc.*`, `clock.*`, `ftimer.*`: 실습 환경 지원 코드
+- `tracefiles/`: 드라이버 테스트용 trace 데이터
 
-## Implementation Highlights
+## 구현 요약
 
-The allocator organizes free blocks with segregated free lists so allocation requests can search a narrower range of candidate blocks. Free blocks are coalesced immediately to reduce fragmentation, and block splitting is used when a larger free block can satisfy a smaller request.
+이 할당기는 free block을 크기별 segregated free list로 나누어 관리합니다. 이를 통해 요청 크기에 따라 탐색 범위를 줄이고, 불필요한 전체 탐색 비용을 낮췄습니다.
 
-For workloads with many repeated small allocations, the allocator keeps a dedicated small-object pool to reduce search overhead and improve throughput. The `realloc` path also attempts in-place growth before falling back to allocate-and-copy behavior.
+또한 free block이 생기면 즉시 coalescing을 수행해 단편화를 줄였고, 더 큰 block을 작은 요청에 사용할 때는 splitting을 통해 공간 낭비를 줄였습니다.
 
-## Reported Results
+작은 크기의 반복 할당이 많은 workload를 고려해 전용 small-object pool도 추가했습니다. `realloc`은 가능하면 기존 block을 바로 확장하고, 불가능할 때만 새 공간을 할당해 복사하도록 구성했습니다.
 
-According to the submitted project report:
+## 보고서 기준 결과
 
-- All benchmark traces passed correctness checks
-- Space utilization: `98%`
-- Throughput: `10,630 Kops`
-- Performance index: `99/100`
+제출 보고서 기준 성능은 다음과 같습니다.
 
-## Build
+- 전체 benchmark trace 통과
+- 메모리 이용률: `98%`
+- 처리량: `10,630 Kops`
+- Performance Index: `99/100`
 
-This project was originally developed for a 32-bit lab environment.
+## 빌드
+
+원래 32비트 실습 환경 기준으로 작성된 프로젝트입니다.
 
 ```bash
 make
 ./mdriver
 ```
 
-Depending on the local toolchain, `-m32` support may be required to build successfully.
+로컬 환경에 따라 `-m32` 지원이 필요할 수 있습니다.
 
-## Note
+## 메모
 
-The original submission report is stored separately from this public portfolio repository to avoid exposing personal academic document details while still preserving the implementation itself.
+원본 제출 보고서는 개인 학사 정보가 포함되어 있어 공개 저장소에는 포함하지 않았습니다. 이 저장소는 구현 코드 자체를 포트폴리오 용도로 정리한 버전입니다.
